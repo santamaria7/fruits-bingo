@@ -25,14 +25,14 @@ $border: 1px solid #dedede;
     &:nth-child(5n + 5) {
       border-bottom: $border;
     }
-    &:nth-child(n+21) {
+    &:nth-child(n + 21) {
       border-bottom: none;
     }
 
     &:before {
       content: "";
       padding-top: 100%;
-      display:block;
+      display: block;
     }
     span {
       position: absolute;
@@ -43,6 +43,7 @@ $border: 1px solid #dedede;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 80%;
     }
   }
 }

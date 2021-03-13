@@ -32,7 +32,7 @@ const randomText = [
 
 function App() {
   const [list, setList] = useState([]);
-
+  const [selectionCount, setSelectionCount] = useState(0);
   function randomize(end) {
     return Math.floor(Math.random() * Math.floor(end));
   }
@@ -115,18 +115,30 @@ function App() {
     const selected = randomize(3); // expected output: 0, 1 or 2
     shuffleMethods[selected]();
   }
-
+  function selectItem(item) {
+    if (fruits.indexOf(item) > -1) {
+      setSelectionCount((prevState) => prevState + 1);
+    }
+  }
   useEffect(() => {
     shuffle();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  useEffect(() => {
+    if (selectionCount === 5) {
+      alert("Yay! You won!");
+      shuffle()
+    }
+  }, [selectionCount]);
   return (
     <div className="App">
       <div className="plate">
         {list.map((item, index) => {
           return (
-            <div key={`${item}-${Math.random()}`}>
+            <div
+              key={`${item}-${Math.random()}`}
+              onClick={() => selectItem(item)}
+            >
               <span>{item}</span>
             </div>
           );
