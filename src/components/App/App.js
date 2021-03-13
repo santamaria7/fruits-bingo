@@ -2,36 +2,41 @@ import "./App.scss";
 import React, { useEffect, useMemo, useState } from "react";
 import Button from "../Button";
 import { fruits, randomText } from "../../constants";
-import party from "party-js";
+
 function App() {
   const [list, setList] = useState([]);
   const [selectionCount, setSelectionCount] = useState(0);
   const [wrongSelection, setWrongSelection] = useState(0);
+  const [winning, setWinning] = useState(false);
   function randomize(end) {
     return Math.floor(Math.random() * Math.floor(end));
   }
 
-  function chooseWord(newList, reference, length) {
-    let j = randomize(length);
-    while (newList.indexOf(fruits[j]) > -1) {
-      j = randomize(length);
-    }
-    return reference[j];
-  }
-
-  function fillList(indexArr) {
-    const newList = [];
-    let i;
-    for (i = 0; i < 25; i++) {
-      if (indexArr.indexOf(i) > -1) {
-        // select from fruitsArray
-        newList[i] = chooseWord(newList, fruits, 5);
-      } else {
-        // select randomly from textArray
-        newList[i] = chooseWord(newList, randomText, 25);
+  function chooseWord(newList, reference, repeat) {
+    let j = randomize(25);
+    if (!repeat) {
+      while (newList.indexOf(reference[j]) > -1) {
+        j = randomize(25);
       }
     }
 
+    return reference[j];
+  }
+
+  function fillList(indexArr, repeat) {
+    const newList = [];
+    let i;
+    for (i = 0; i < 25; i++) {
+      if (i === 12) {
+        // The free slot
+        newList[i] = "";
+      } else {
+        newList[i] =
+          indexArr.indexOf(i) > -1
+            ? chooseWord(newList, fruits, repeat) // choose randomly from fruits array
+            : chooseWord(newList, randomText, repeat); //choose randomly from words array
+      }
+    }
     setList(newList);
   }
   function columnShuffle() {
@@ -41,7 +46,7 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = start + i * 5;
     }
-    fillList(indexArr);
+    return indexArr;
   }
   function rowShuffle() {
     /*
@@ -58,7 +63,7 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = rowNumber * 5 + i;
     }
-    fillList(indexArr);
+    return indexArr;
   }
   function diagonalShuffle() {
     /*
@@ -83,20 +88,27 @@ function App() {
         indexArr[i] = 4 * i; // i * 5 - i
       }
     }
-
-    fillList(indexArr);
+    return indexArr;
   }
-
+  function multipleShuffle() {
+    // The simplest case of having 1 row, 1 column and 1 diagonal bingo
+    const indexArr1 = rowShuffle();
+    const indexArr2 = columnShuffle();
+    const indexArr3 = diagonalShuffle();
+    return [...new Set([...indexArr1, ...indexArr2, ...indexArr3])];
+  }
   const shuffleMethods = useMemo(() => {
     return {
       0: columnShuffle,
       1: rowShuffle,
       2: diagonalShuffle,
+      3: multipleShuffle,
     };
   }, []);
   function shuffle() {
-    const selected = randomize(3); // expected output: 0, 1 or 2
-    shuffleMethods[selected]();
+    const selected = randomize(4); // expected output: 0, 1, 2 or 3
+    const indexArr = shuffleMethods[selected]();
+    fillList(indexArr, selected === 3);
   }
   function selectItem(item, deselect) {
     if (fruits.indexOf(item) > -1) {
@@ -110,11 +122,14 @@ function App() {
       });
     }
   }
-  async function celebrate(){
-    await party.screen();
+  async function celebrate() {
+    setWinning(true);
     setSelectionCount(0);
     await setWrongSelection(0);
-    shuffle();
+    window.setTimeout(() => {
+      setWinning(false);
+      //shuffle();
+    }, 3000);
   }
   useEffect(() => {
     shuffle();
@@ -122,14 +137,13 @@ function App() {
   }, []);
   useEffect(() => {
     if (selectionCount === 5 && wrongSelection === 0) {
-      celebrate()
-
+      celebrate();
     }
   }, [selectionCount, wrongSelection]);
   return (
     <div className="App">
       <h1>Fruit Bingo</h1>
-      <div className="plate">
+      <div className={`plate ${winning ? "winning" : ""}`}>
         {list.map((item, index) => {
           return (
             <Button
