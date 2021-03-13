@@ -1,38 +1,12 @@
 import "./App.scss";
 import React, { useEffect, useMemo, useState } from "react";
-
-const fruits = ["pomegranate", "peach", "pear", "orange", "sour cherry"];
-const randomText = [
-  "suggest",
-  "bag",
-  "ponder",
-  "zinc",
-  "come",
-  "slip",
-  "coherent",
-  "infamous",
-  "expect",
-  "unsightly",
-  "mix",
-  "fancy",
-  "meal",
-  "devilish",
-  "division",
-  "public",
-  "field",
-  "stop",
-  "material",
-  "fluttering",
-  "brass",
-  "adorable",
-  "camp",
-  "sit",
-  "tiny",
-];
+import Button from "../Button";
+import { fruits, randomText } from "../../constants";
 
 function App() {
   const [list, setList] = useState([]);
   const [selectionCount, setSelectionCount] = useState(0);
+  const [wrongSelection, setWrongSelection] = useState(0)
   function randomize(end) {
     return Math.floor(Math.random() * Math.floor(end));
   }
@@ -124,9 +98,17 @@ function App() {
     const selected = randomize(3); // expected output: 0, 1 or 2
     shuffleMethods[selected]();
   }
-  function selectItem(item) {
+  function selectItem(item, deselect) {
     if (fruits.indexOf(item) > -1) {
       setSelectionCount((prevState) => prevState + 1);
+    }
+    else {
+      setWrongSelection(prevState => {
+        if(deselect){
+          return prevState - 1;
+        }
+        return prevState + 1;
+      })
     }
   }
   useEffect(() => {
@@ -134,23 +116,23 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (selectionCount === 5) {
+    if (selectionCount === 5 && wrongSelection === 0) {
       alert("Yay! You won!");
       shuffle();
       setSelectionCount(0);
+      setWrongSelection(0)
     }
-  }, [selectionCount]);
+  }, [selectionCount, wrongSelection]);
   return (
     <div className="App">
       <div className="plate">
         {list.map((item, index) => {
           return (
-            <div
-              key={`${item}-${Math.random()}`}
-              onClick={() => selectItem(item)}
-            >
-              <span>{item}</span>
-            </div>
+            <Button
+              onClick={(deselect) => selectItem(item, deselect)}
+              item={item}
+              key={`${item}-${index}`}
+            />
           );
         })}
       </div>

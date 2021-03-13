@@ -16,6 +16,8 @@ $border: 1px solid #dedede;
     min-width: calc((100% / 5) - 2px);
     max-width: calc((100% / 5) - 2px);
     position: relative;
+    transition: all ease 0.5s;
+    cursor: pointer;
     &:not(:nth-child(5n + 5)) {
       border: {
         right: $border;
@@ -44,6 +46,14 @@ $border: 1px solid #dedede;
       align-items: center;
       justify-content: center;
       font-size: 80%;
+    }
+    &.selected {
+      &.right {
+        box-shadow: inset 0px 0px 12px 4px #7dd698;
+      }
+      &.wrong {
+        box-shadow: inset 0px 0px 12px 4px #d64c41;
+      }
     }
   }
 }
