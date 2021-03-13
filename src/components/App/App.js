@@ -36,45 +36,40 @@ function App() {
   function randomize(end) {
     return Math.floor(Math.random() * Math.floor(end));
   }
-  function chooseWord(indexArr, index) {
-    let fruitIndex;
-    if (indexArr.indexOf(index) > -1) {
-      // select from fruitsArray and return
-      let i = randomize(5);
-      if (i === fruitIndex) {
-        i = randomize(5);
-      }
-      fruitIndex = i;
-      return fruits[fruitIndex];
+
+  function chooseWord(newList, reference, length) {
+    let j = randomize(length);
+    while (newList.indexOf(fruits[j]) > -1) {
+      j = randomize(length);
     }
-    // select randomly from textArray and return
-    return randomText[randomize(25)];
-    //TODO: fix duplicates
+    return reference[j];
   }
+
   function fillList(indexArr) {
     const newList = [];
     let i;
     for (i = 0; i < 25; i++) {
-      newList[i] = chooseWord(indexArr, i);
+      if (indexArr.indexOf(i) > -1) {
+        // select from fruitsArray
+        newList[i] = chooseWord(newList, fruits, 5);
+      } else {
+        // select randomly from textArray
+        newList[i] = chooseWord(newList, randomText, 25);
+      }
     }
-
-    console.log(newList);
 
     setList(newList);
   }
   function columnShuffle() {
-    console.log("column");
     const start = randomize(5);
     const indexArr = [];
     let i;
     for (i = 0; i < 5; i++) {
       indexArr[i] = start + i * 5;
     }
-    console.log(indexArr);
     fillList(indexArr);
   }
   function rowShuffle() {
-    console.log("row");
     /*
      * row number 0 => 00 01 02 03 04
      * row number 1 => 05 06 07 08 09
@@ -89,11 +84,9 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = rowNumber * 5 + i;
     }
-    console.log(indexArr);
     fillList(indexArr);
   }
   function diagonalShuffle() {
-    console.log("diagonal");
     /*
      * row number 0 => 00 01 02 03 04
      * row number 1 => 05 06 07 08 09
@@ -107,7 +100,6 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = i * 5 + i;
     }
-    console.log(indexArr);
     fillList(indexArr);
     //TODO: implement reverse diagonal
   }
@@ -121,7 +113,6 @@ function App() {
   }, []);
   function shuffle() {
     const selected = randomize(3); // expected output: 0, 1 or 2
-    console.log(selected);
     shuffleMethods[selected]();
   }
 
