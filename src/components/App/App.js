@@ -80,13 +80,28 @@ function App() {
     }
     fillList(indexArr);
   }
-  function diagnolShuffle() {}
+  function diagonalShuffle () {
+    /*
+     * row number 0 => 00 01 02 03 04
+     * row number 1 => 05 06 07 08 09
+     * row number 2 => 10 11 12 13 14
+     * row number 3 => 15 16 17 18 19
+     * row number 4 => 20 21 22 23 24
+     *
+     * */
+    let i;
+    const indexArr = [];
+    for (i = 0; i < 5; i++) {
+      indexArr[i] = i * 5 + i;
+    }
+    fillList(indexArr);
+  }
 
   const shuffleMethods = useMemo(() => {
     return {
       0: columnShuffle,
       1: rowShuffle,
-      2: diagnolShuffle,
+      2: diagonalShuffle,
     };
   }, []);
   function shuffle() {
