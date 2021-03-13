@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import React, { useEffect, useMemo, useState } from "react";
 
 const fruits = ["pomegranate", "peach", "pear", "orange", "sour cherry"];
@@ -36,34 +36,45 @@ function App() {
   function randomize(end) {
     return Math.floor(Math.random() * Math.floor(end));
   }
-  function fillList(indexArr) {
-    const newList = list.map((item, index) => {
-      let fruitIndex;
-      if (indexArr.indexOf(index) > -1) {
-        // select from fruitsArray and return
-        let i = randomize(5);
-        if (i === fruitIndex) {
-          i = randomize(5);
-        }
-        fruitIndex = i;
-        return fruits[fruitIndex];
+  function chooseWord(indexArr, index) {
+    let fruitIndex;
+    if (indexArr.indexOf(index) > -1) {
+      // select from fruitsArray and return
+      let i = randomize(5);
+      if (i === fruitIndex) {
+        i = randomize(5);
       }
-      // select randomly from textArray and return
-      return randomText[randomize(25)];
-      //TODO: fix duplicates
-    });
+      fruitIndex = i;
+      return fruits[fruitIndex];
+    }
+    // select randomly from textArray and return
+    return randomText[randomize(25)];
+    //TODO: fix duplicates
+  }
+  function fillList(indexArr) {
+    const newList = [];
+    let i;
+    for (i = 0; i < 25; i++) {
+      newList[i] = chooseWord(indexArr, i);
+    }
+
+    console.log(newList);
+
     setList(newList);
   }
   function columnShuffle() {
+    console.log("column");
     const start = randomize(5);
     const indexArr = [];
     let i;
     for (i = 0; i < 5; i++) {
       indexArr[i] = start + i * 5;
     }
+    console.log(indexArr);
     fillList(indexArr);
   }
   function rowShuffle() {
+    console.log("row");
     /*
      * row number 0 => 00 01 02 03 04
      * row number 1 => 05 06 07 08 09
@@ -78,9 +89,11 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = rowNumber * 5 + i;
     }
+    console.log(indexArr);
     fillList(indexArr);
   }
-  function diagonalShuffle () {
+  function diagonalShuffle() {
+    console.log("diagonal");
     /*
      * row number 0 => 00 01 02 03 04
      * row number 1 => 05 06 07 08 09
@@ -94,7 +107,9 @@ function App() {
     for (i = 0; i < 5; i++) {
       indexArr[i] = i * 5 + i;
     }
+    console.log(indexArr);
     fillList(indexArr);
+    //TODO: implement reverse diagonal
   }
 
   const shuffleMethods = useMemo(() => {
@@ -106,9 +121,8 @@ function App() {
   }, []);
   function shuffle() {
     const selected = randomize(3); // expected output: 0, 1 or 2
-
-    const newList = shuffleMethods[selected]();
-    setList(newList);
+    console.log(selected);
+    shuffleMethods[selected]();
   }
 
   useEffect(() => {
@@ -116,7 +130,19 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div className="App"></div>;
+  return (
+    <div className="App">
+      <div className="plate">
+        {list.map((item, index) => {
+          return (
+            <div key={`${item}-${Math.random()}`}>
+              <span>{item}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default App;
