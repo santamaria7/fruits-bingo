@@ -125,6 +125,7 @@ function App() {
   }, [selectionCount, wrongSelection]);
   return (
     <div className="App">
+      <h1>Fruit Bingo</h1>
       <div className="plate">
         {list.map((item, index) => {
           return (

@@ -2,15 +2,18 @@ $border: 1px solid #dedede;
 
 .App {
   text-align: center;
+  padding: 20px 10px;
 }
 .plate {
+  position: relative;
   width: 100%;
   max-width: 600px;
-  margin: 0 auto;
+  margin: 35px auto 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   border: $border;
+  box-shadow: 0 0 14px 4px rgba(120,112,126,0.25);
   div {
     flex-grow: 1;
     min-width: calc((100% / 5) - 2px);
@@ -46,6 +49,7 @@ $border: 1px solid #dedede;
       align-items: center;
       justify-content: center;
       font-size: 80%;
+      word-break: break-word;
     }
     &.selected {
       &.right {
