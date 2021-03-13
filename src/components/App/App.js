@@ -97,11 +97,20 @@ function App() {
      * */
     let i;
     const indexArr = [];
-    for (i = 0; i < 5; i++) {
-      indexArr[i] = i * 5 + i;
+    const side = randomize(2); // 0 or 1
+    if (side === 0) {
+      // from left to right \
+      for (i = 0; i < 5; i++) {
+        indexArr[i] = 6 * i; //  5 * i + i
+      }
+    } else {
+      //from right to left /
+      for (i = 5; i > 0; i--) {
+        indexArr[i] = 4 * i; // i * 5 - i
+      }
     }
+
     fillList(indexArr);
-    //TODO: implement reverse diagonal
   }
 
   const shuffleMethods = useMemo(() => {
@@ -127,7 +136,8 @@ function App() {
   useEffect(() => {
     if (selectionCount === 5) {
       alert("Yay! You won!");
-      shuffle()
+      shuffle();
+      setSelectionCount(0);
     }
   }, [selectionCount]);
   return (
