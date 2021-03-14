@@ -2,14 +2,27 @@ import "./App.scss";
 import React, { useEffect, useMemo, useState } from "react";
 import Button from "../Button";
 import { fruits, randomText } from "../../constants";
-import {chooseWord, columnShuffle, diagonalShuffle, multipleShuffle, randomize, rowShuffle} from "../../utils";
+import {
+  chooseWord,
+  columnShuffle,
+  diagonalShuffle,
+  multipleShuffle,
+  randomize,
+  rowShuffle,
+} from "../../utils";
 
 function App() {
   const [list, setList] = useState([]);
   const [selectionCount, setSelectionCount] = useState(0);
   const [wrongSelection, setWrongSelection] = useState(0);
   const [winning, setWinning] = useState(false);
-
+  const [center, setCenter] = useState({
+    0: false, //column
+    1: false, //row
+    2: true, //diagonal
+  });
+  const [indexObj, setIndexObj] = useState({});
+  const [selectedFruits, setSelectedFruits] = useState([]);
   const shuffleMethods = useMemo(() => {
     return {
       0: columnShuffle,
@@ -34,16 +47,33 @@ function App() {
     setList(newList);
   }
 
-  function shuffle() {
-    const selected = 3; // randomize(4); // expected output: 0, 1, 2 or 3
-    const indexArr = shuffleMethods[selected]();
+  function updateStates(obj) {
+    setIndexObj(obj);
+    setSelectionCount(0);
+    setSelectedFruits([]);
+    const centerPayload = Object.keys(obj).reduce((a, b) => {
+      a[b] = obj[b].indexOf(12) > -1;
+      return a;
+    }, {});
+    setCenter(centerPayload);
+  }
 
+  function shuffle() {
+    const selected = randomize(4); // expected output: 0, 1, 2 or 3
+    const obj = shuffleMethods[selected]();
+    let indexArr = obj[selected] || [];
+    if (selected === 3) {
+      const concat = Object.values(obj).reduce((a, b) => a.concat(b), []);
+      indexArr = [...new Set([...concat])];
+    }
+    updateStates(obj);
     fillList(indexArr, selected === 3);
   }
 
   function selectItem(item, deselect) {
-    if (fruits.indexOf(item) > -1) {
+    if (fruits.indexOf(item.name) > -1) {
       setSelectionCount((prevState) => prevState + 1);
+      setSelectedFruits((prevState) => [...prevState, item.index]);
     } else {
       setWrongSelection((prevState) => {
         if (deselect) {
@@ -53,14 +83,41 @@ function App() {
       });
     }
   }
-
-  async function celebrate() {
+  function getSharedItems(direction) {
+    const obj = { ...indexObj };
+    delete obj[direction];
+    const arr = Object.values(obj).flat();
+    return selectedFruits.filter((item, index) => arr.indexOf(item) > -1);
+  }
+  async function celebrate(direction) {
+    const sharedItems = getSharedItems(direction);
     setWinning(true);
+    setSelectedFruits(sharedItems);
+    setSelectionCount(sharedItems.length);
     await setWrongSelection(0);
     window.setTimeout(() => {
       setWinning(false);
-      //shuffle();
     }, 3000);
+  }
+
+  function findDirection() {
+    let direction = 0;
+    Object.keys(indexObj).forEach((x) => {
+      let count = 0;
+      const reference = indexObj[x];
+      selectedFruits.forEach((n) => {
+        if (reference.indexOf(n) > -1) {
+          count += 1;
+        }
+      });
+      if (
+        count === reference.length ||
+        (count === reference.length - 1 && reference.indexOf(12) > -1)
+      ) {
+        direction = x;
+      }
+    });
+    return direction;
   }
 
   useEffect(() => {
@@ -68,10 +125,14 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (selectionCount === 5 && wrongSelection === 0) {
-      celebrate();
+    const direction = findDirection();
+    if (
+      (selectionCount === 5 || (selectionCount === 4 && center[direction])) &&
+      wrongSelection === 0
+    ) {
+      celebrate(direction);
     }
-  }, [selectionCount, wrongSelection]);
+  }, [selectionCount, wrongSelection, center]);
 
   return (
     <div className="App">
@@ -80,13 +141,18 @@ function App() {
         {list.map((item, index) => {
           return (
             <Button
-              onClick={(deselect) => selectItem(item, deselect)}
+              onClick={(deselect) =>
+                selectItem({ index, name: item }, deselect)
+              }
               item={item}
               key={`${item}-${index}`}
             />
           );
         })}
       </div>
+      <button type="button" onClick={shuffle} className="restart">
+        Restart The Game
+      </button>
     </div>
   );
 }
