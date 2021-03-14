@@ -16,7 +16,7 @@ $border: 1px solid #dedede;
   box-shadow: 0 0 14px 4px rgba(120, 112, 126, 0.25);
   &.winning {
     box-shadow: 0 0 14px 4px rgb(250, 255, 138);
-    border-image: linear-gradient(#f6b73c, #4d9f0c) 30 / 10px stretch;
+    border-image: linear-gradient(#f5f649, #4d9f0c) 30 / 10px stretch;
   }
   div {
     flex-grow: 1;
